@@ -1,4 +1,6 @@
 import logging
+
+from decouple import config
 from django.core.management.base import BaseCommand
 from telegram import Update
 from telegram.ext import (
@@ -50,7 +52,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         application = (
             ApplicationBuilder()
-            .token("7005564520:AAGQLzzfu51fy15ehElaGU3c9YCJqZHa3Vk")
+            .token(config('TELEGRAM_BOT_TOKEN'))
             .build()
         )
 
