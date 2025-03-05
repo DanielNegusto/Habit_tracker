@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-web:${{ github.sha }}
+    image: ${DOCKER_HUB_USERNAME}/myapp-web:${GITHUB_SHA}
     command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
     env_file:
       - .env
@@ -19,7 +19,7 @@ services:
   nginx:
     build:
       context: ./nginx
-    image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-nginx:${{ github.sha }}
+    image: ${DOCKER_HUB_USERNAME}/myapp-nginx:${GITHUB_SHA}
     ports:
       - "80:80"
     volumes:
@@ -49,7 +49,7 @@ services:
 
   celery:
     build: .
-    image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-celery:${{ github.sha }}
+    image: ${DOCKER_HUB_USERNAME}/myapp-celery:${GITHUB_SHA}
     command: celery -A config worker --loglevel=info
     env_file:
       - .env
@@ -61,7 +61,7 @@ services:
 
   celery-beat:
     build: .
-    image: ${{ secrets.DOCKER_HUB_USERNAME }}/myapp-celery-beat:${{ github.sha }}
+    image: ${DOCKER_HUB_USERNAME}/myapp-celery-beat:${GITHUB_SHA}
     command: celery -A config beat --loglevel=info
     env_file:
       - .env

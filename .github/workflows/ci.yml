@@ -56,6 +56,8 @@ jobs:
         run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
       - name: Build and push Docker images
+        env:
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           docker compose -f docker-compose.yaml build
           docker compose -f docker-compose.yaml push
