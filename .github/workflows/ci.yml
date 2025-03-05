@@ -3,33 +3,68 @@ name: Django CI/CD Pipeline
 on: [push, pull_request]
 
 jobs:
-  deploy:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.0
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-      - name: Deploy to Server
+          python-version: '3.13'
+
+      - name: Install flake8
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            echo "Using existing .env file..."
+          python -m pip install --upgrade pip
+          python -m pip install flake8
 
-            echo "Pulling Docker images..."
-            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+      - name: Run flake8
+        run: flake8 .
 
-            if [ $(sudo docker ps -aq -f name=myapp) ]; then
-                echo "Stopping existing container..."
-                sudo docker stop myapp
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
-                echo "Removing existing container..."
-                sudo docker rm myapp
-            else
-                echo "No existing container to stop or remove."
-            fi
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
 
-            echo "Starting new container..."
-            sudo docker run -d --name myapp -p 80:8000 --env-file .env ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
 
-            echo "Deployment complete."
-          EOF
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r req.txt 
+
+      - name: Run tests
+        run: python manage.py test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: |
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env
+
+      - name: Log in to Docker Hub
+        run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Build and push Docker images
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          docker compose -f docker-compose.yaml build
+          docker compose -f docker-compose.yaml push
