@@ -58,18 +58,19 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             # Переходим в папку проекта или клонируем его, если он еще не существует
             if [ ! -d "Habit_tracker" ]; then
-              git clone https://github.com/DanielNegusto/Habit_tracker.git Habit_tracker
+              git clone https://github.com/yourusername/your-repo.git Habit_tracker
             fi
-          
-            cd Habit_tracker;
+            
+            cd Habit_tracker || exit 1;  # Переход в директорию, если не удалось - выход с ошибкой
+            echo "Текущая директория: $(pwd)";  # Вывод текущей директории для отладки
             git checkout main;
             git pull;
           
             # Остановка и удаление старых контейнеров
-            docker-compose --file docker-compose.yml down;
+            docker-compose --file docker-compose.yaml down;
           
             # Запуск новых контейнеров
-            docker-compose --file docker-compose.yml up -d;
+            docker-compose --file docker-compose.yaml up -d;
           
             # Очистка неиспользуемых образов и контейнеров
             docker system prune --all --force;
