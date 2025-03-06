@@ -1,10 +1,11 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: ${DOCKER_HUB_USERNAME}/myapp-web:${GITHUB_SHA}
-    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
+    build: .
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000"
     env_file:
       - .env
     volumes:
@@ -19,7 +20,6 @@ services:
   nginx:
     build:
       context: ./nginx
-    image: ${DOCKER_HUB_USERNAME}/myapp-nginx:${GITHUB_SHA}
     ports:
       - "80:80"
     volumes:
@@ -28,19 +28,19 @@ services:
     depends_on:
       - web
 
-  db:
-    image: postgres
-    env_file:
-      - .env
-    expose:
-      - "5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+db:
+  image: postgres
+  env_file:
+    - .env
+  expose:
+    - "5432"
+  healthcheck:
+    test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
+    interval: 30s
+    timeout: 10s
+    retries: 5
+  volumes:
+    - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis
@@ -49,7 +49,6 @@ services:
 
   celery:
     build: .
-    image: ${DOCKER_HUB_USERNAME}/myapp-celery:${GITHUB_SHA}
     command: celery -A config worker --loglevel=info
     env_file:
       - .env
@@ -61,7 +60,6 @@ services:
 
   celery-beat:
     build: .
-    image: ${DOCKER_HUB_USERNAME}/myapp-celery-beat:${GITHUB_SHA}
     command: celery -A config beat --loglevel=info
     env_file:
       - .env
