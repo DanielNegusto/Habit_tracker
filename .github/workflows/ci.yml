@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      SERVER_IP: ${{ secrets.SERVER_IP }}
 
     steps:
       - name: Check out code
