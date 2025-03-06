@@ -57,13 +57,12 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            # Переходим в папку проекта или клонируем его, если он еще не существует
             if [ ! -d "Habit_tracker" ]; then
-              git clone https://github.com/yourusername/your-repo.git Habit_tracker
+              git clone https://github.com/DanielNegusto/Habit_tracker.git Habit_tracker
             fi
             
-            cd Habit_tracker || exit 1;  # Переход в директорию, если не удалось - выход с ошибкой
-            echo "Текущая директория: $(pwd)";  # Вывод текущей директории для отладки
+            cd Habit_tracker || exit 1;  
+            echo "Текущая директория: $(pwd)"; 
             git checkout main;
             git pull;
           
