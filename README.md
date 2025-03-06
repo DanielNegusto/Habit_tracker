@@ -12,7 +12,7 @@ API разработан с использованием Django и Django REST F
 1. Клонируйте репозиторий:
 
 ```bash
-   git clone https://github.com/ваш-логин/ваш-репозиторий.git
+   git clone https://github.com/DanielNegusto/Habit_tracker.git
    cd ваш-репозиторий
 ```
 
@@ -114,3 +114,38 @@ Authorization: Bearer <token>
    python manage.py start_bot
 ```
 Запускает телеграм бота в который можно вписать email пользователя и к нему привяжется telegram chat_id
+
+### Docker
+
+Для запуска проекта в контейнере Docker рекомендуется использовать docker-compose.yml:
+```bash
+   docker-compose up -d --build
+```
+Соберёт и запустит контейнеры с Django, PostgreSQL, Redis и Celery локально.
+### Развертывание приложения
+Для того что бы запустить проект на сервере вам нужно 
+- Подключиться к вашей виртуальной машине(серверу)
+- Установить Docker и Docker Compose
+- Склонировать репозиторий
+- Перейти в директории проекта
+- Создать .env файл по примеру .env_example и заполнить его вашими данными
+```bash
+  nano .env 
+```
+- Запустить Docker Compose
+### GitHub Action
+В проекте настроен GitHub Action с помощью которого автоматически запускаются линтеры, тесты и развертывание приложения на сервере
+для action вам потребуется добавть секреты в ваш репозиторий в настройках репозитория:
+- DEBUG - для логирования дебага
+- POSTGRES_DB - имя базы данных
+- POSTGRES_PASSWORD - пароль для базы данных
+- POSTGRES_USER - имя пользователя для базы данных
+- SECRET_KEY - секретный ключ Django
+- SERVER_IP - IP сервера
+- SSH_KEY - SSH ключ для подключения к серверу
+- SSH_USER - имя пользователя SSH
+- TELEGRAM_BOT_TOKEN - токен бота Telegram
+
+## IP сервера
+
+Приложение доступно по адресу: [158.160.140.185](http://158.160.140.185)
