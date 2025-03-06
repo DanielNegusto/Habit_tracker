@@ -67,6 +67,17 @@ jobs:
             git checkout main;
             git pull;
           
+            # Создание .env файла с переменными окружения
+            cat <<EOL > .env
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            DEBUG=${{ secrets.DEBUG }}
+            TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            SERVER_IP=${{ secrets.SERVER_IP }}
+            EOL
+          
             # Остановка и удаление старых контейнеров
             sudo docker-compose --file docker-compose.yaml down;
           
