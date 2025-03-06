@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   web:
     build: .
@@ -28,19 +30,19 @@ services:
     depends_on:
       - web
 
-db:
-  image: postgres
-  env_file:
-    - .env
-  expose:
-    - "5432"
-  healthcheck:
-    test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
-    interval: 30s
-    timeout: 10s
-    retries: 5
-  volumes:
-    - postgres_data:/var/lib/postgresql/data
+  db:
+    image: postgres  # Исправлено: добавлен отступ
+    env_file:
+      - .env
+    expose:
+      - "5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis
@@ -72,3 +74,4 @@ db:
 volumes:
   postgres_data:
   static_volume:
+

@@ -67,11 +67,11 @@ jobs:
             git pull;
           
             # Остановка и удаление старых контейнеров
-            docker-compose --file docker-compose.yaml down;
+            sudo docker-compose --file docker-compose.yaml down;
           
             # Запуск новых контейнеров
-            docker-compose --file docker-compose.yaml up -d;
+            sudo docker-compose --file docker-compose.yaml up -d;
           
             # Очистка неиспользуемых образов и контейнеров
-            docker system prune --all --force;
+            sudo docker system prune --all --force;
           EOF
